@@ -1,10 +1,10 @@
-== BookingStream
+## BookingStream
 
-Processing based visualization for showing an overview of where and when
-bookings are made over time along with travel distances to/from
-providers to each location.
+Processing based visualization showing streamings points  where
+bookings are made over time and travel distances between providers and
+bookings.
 
-=== How it works
+### How it works
 
 Data is read from a JSON file exported from the database containing
 the UNIX timestamps for the start and end time of each booking.
