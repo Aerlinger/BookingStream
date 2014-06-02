@@ -20,23 +20,8 @@ class Renderer extends GenericFrameEvent {
       keys = new ArrayList<Keyframe>();
 
     keys.add(keyframe); 
-    
     keyframes.put(frame_start, keys);
     
-//    ArrayList<Keyframe> end_keys   = keyframes.get(booking_end_frame_source);
-//
-//    if (start_keys == null)
-//      start_keys = new ArrayList<Keyframe>();
-//
-//    if (end_keys == null)
-//      end_keys = new ArrayList<Keyframe>();
-//
-//    start_keys.add(keyframe_arrive);  
-//    end_keys.add(keyframe_depart);
-//
-//    keyframes.put(booking_start_frame_source, start_keys);
-//    keyframes.put(booking_end_frame_source, end_keys);
-
     return keyframe;
   }
   
@@ -46,35 +31,6 @@ class Renderer extends GenericFrameEvent {
     
     return addKeyframe(frameStart, frameEnd, sourceLocation, destinationLocation);
   }
-  
-//  void step() {
-//    for (int i=0; keyframe_list != null && i < keyframe_list.size (); ++i) {
-//      Keyframe kf = keyframe_list.get(i);    
-//      
-//      float start_lat = kf.start_latitude;
-//      float start_lon = kf.start_longitude;
-//      
-//      float end_lat = kf.end_latitude;
-//      float end_lon = kf.end_longitude;
-//      
-//      PVector source_coord = geodetic_to_cartesian(start_lat, start_lon);
-//      PVector dest_coord = geodetic_to_cartesian(end_lat, end_lon);
-//      
-//      float init_x = source_coord.x;
-//      float init_y = source_coord.y;
-//      
-//      float end_x = dest_coord.x;
-//      float end_y = dest_coord.y;
-//      
-//      fill(255, 255, 0);
-//      ellipse(init_x % width, init_y % height, 2, 2);
-//      
-//      fill(0, 0, 255);
-//      ellipse(end_x % width, end_y % height, 1, 1);
-//      
-//      ps.addParticle(new PVector(init_x % WIDTH, init_y % HEIGHT), new PVector(end_x % WIDTH, end_y % HEIGHT));
-//    }
-//  }
   
   void drawProviderLocation(float x, float y) {
     fill(255, 255, 0);
@@ -98,16 +54,13 @@ class Renderer extends GenericFrameEvent {
   
     ArrayList<Keyframe> keyframeChain = keyframes.get(frame_number);
   
-    ps.run();
+    particleSystem.run();
   
     for (int i=0; keyframeChain != null && i < keyframeChain.size(); ++i) {
-      Keyframe kf = keyframeChain.get(i);
+      Keyframe keyframe = keyframeChain.get(i);
   
-      float end_lat = kf.end_latitude;
-      float end_lon = kf.end_longitude;
-  
-      PVector source_coord = geodetic_to_cartesian(kf.start_latitude, kf.start_longitude);
-      PVector dest_coord = geodetic_to_cartesian(kf.end_latitude, kf.end_longitude);
+      PVector source_coord = geodetic_to_cartesian(keyframe.start_latitude, keyframe.start_longitude);
+      PVector dest_coord = geodetic_to_cartesian(keyframe.end_latitude, keyframe.end_longitude);
   
       float init_x = source_coord.x;
       float init_y = source_coord.y;

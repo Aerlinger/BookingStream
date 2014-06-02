@@ -1,4 +1,4 @@
-ParticleSystem ps;
+ParticleSystem particlePool;
 Renderer renderer;
 
 int fps = 30;
@@ -11,9 +11,6 @@ int provider_travel_time_in_frames = sim_frames_per_hour / 2;
 
 long max_time; 
 long min_time; 
-
-int WIDTH = 1280;
-int HEIGHT = 1024;
 
 // TODO: lat/longs are still miscoded for many providers so we need to actually hardcode them.
 float min_latitude;
@@ -86,9 +83,12 @@ void printDebugInfo() {
 
 
 void setup() {
+  int WIDTH = 1280;
+  int HEIGHT = 1024;
+  
   JSONArray booking_events = loadJSONArray("/Users/Aerlinger/Documents/Processing/particle_system/booking_stream.json");
 
-  ps = new ParticleSystem(); 
+  particlePool = new ParticleSystem(); 
 
   precalculate_geospatial_boundaries(booking_events);
 
@@ -115,43 +115,6 @@ void setup() {
 
     renderer.addKeyframeByUnixTime(booking_start_time, booking_start_time - provider_travel_time_in_seconds, provider_location, booking_location);
     renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location);
-
-//    long booking_start_frame_source = unixtime_to_frame_number(booking_start_time) - provider_travel_time_in_frames;   // Provider dot leaves their home
-//    long booking_start_frame_dest  = unixtime_to_frame_number(booking_start_time);                                     // Provider dot arrives at booking
-
-//    long booking_end_frame_source  = unixtime_to_frame_number(booking_end_time);                                       // Provider dot leaves booking
-//    long booking_end_frame_dest    = unixtime_to_frame_number(booking_end_time) + provider_travel_time_in_frames;      // Provider dot arrives back home
-
-    
-
-//    Keyframe keyframe_arrive = new Keyframe( booking_start_frame_source, 
-//                                             booking_start_frame_dest, 
-//                                             provider_latitude, 
-//                                             provider_longitude, 
-//                                             booking_latitude, 
-//                                             booking_longitude );
-//
-//    Keyframe keyframe_depart = new Keyframe( booking_end_frame_source, 
-//                                             booking_end_frame_dest, 
-//                                             booking_latitude, 
-//                                             booking_longitude, 
-//                                             provider_latitude, 
-//                                             provider_longitude );
-//
-//    ArrayList<Keyframe> start_keys = keyframes.get(booking_start_frame_source);
-//    ArrayList<Keyframe> end_keys   = keyframes.get(booking_end_frame_source);
-//
-//    if (start_keys == null)
-//      start_keys = new ArrayList<Keyframe>();
-//
-//    if (end_keys == null)
-//      end_keys = new ArrayList<Keyframe>();
-//
-//    start_keys.add(keyframe_arrive);  
-//    end_keys.add(keyframe_depart);
-//
-//    keyframes.put(booking_start_frame_source, start_keys);
-//    keyframes.put(booking_end_frame_source, end_keys);
   }
 
   size(WIDTH, HEIGHT);
@@ -162,59 +125,10 @@ void setup() {
 long frame_number = 0;
 
 void draw() {
-  fill(0, 100);
-  rect(0, 0, WIDTH, HEIGHT);
-
   frame_number++;
 
-  renderer.render(ps);
-  //ArrayList<Keyframe> keyframe_list = keyframes.get(frame_number);
-
-  ps.run();
-
-//  for (int i=0; keyframe_list != null && i < keyframe_list.size (); ++i) {
-//
-//    Keyframe kf = keyframe_list.get(i);    
-//
-//    float start_lat = kf.start_latitude;
-//    float start_lon = kf.start_longitude;
-//
-//    float end_lat = kf.end_latitude;
-//    float end_lon = kf.end_longitude;
-//
-//    PVector source_coord = geodetic_to_cartesian(start_lat, start_lon);
-//    PVector dest_coord = geodetic_to_cartesian(end_lat, end_lon);
-//
-//    float init_x = source_coord.x;
-//    float init_y = source_coord.y;
-//
-//    float end_x = dest_coord.x;
-//    float end_y = dest_coord.y;
-//
-//    fill(255, 255, 0);
-//    ellipse(init_x % width, init_y % height, 2, 2);
-//
-//    fill(0, 0, 255);
-//    ellipse(end_x % width, end_y % height, 1, 1);
-//
-//    ps.addParticle(new PVector(init_x % WIDTH, init_y % HEIGHT), new PVector(end_x % WIDTH, end_y % HEIGHT));
-//  }
+  renderer.render(particlePool);  
 }
 
-//class Runner {
-//  ArrayList<> EventListeners
-//  
-//  public Runner() {
-//  }
-//  
-//  public setup() {
-//  }
-//  
-//  public () {
-//  }
-//  
-//  private void initializeDependencies() {
-//  }
-//}
 
 
