@@ -1,9 +1,10 @@
 class Renderer extends GenericFrameEvent {
   private HashMap<Long, ArrayList<Keyframe>> keyframes;
-  private int frameNumber = 0; 
+  private long frameNumber;
   
   public Renderer() {
     keyframes = new HashMap<Long, ArrayList<Keyframe>>();
+    this.frameNumber = 0;
   }
   
   public Keyframe addKeyframe(long frame_start, long frame_end, PVector sourceLocation, PVector destinationLocation) {
@@ -32,46 +33,40 @@ class Renderer extends GenericFrameEvent {
     return addKeyframe(frameStart, frameEnd, sourceLocation, destinationLocation);
   }
   
-  void drawProviderLocation(float x, float y) {
+  void drawProviderLocation(PVector providerLocation) {
     fill(255, 255, 0);
-    ellipse(x % width, y % height, 2, 2);
+    ellipse(providerLocation.x % width, providerLocation.y % height, 2, 2);
   }
   
-  void drawBookingLocation(float x, float y) {
+  void drawBookingLocation(PVector bookingLocation) {
      fill(255, 0, 255);
-     ellipse(x % width, y % height, 1, 1);
+     ellipse(bookingLocation.x % width, bookingLocation.y % height, 1, 1);
   }
   
   void spawnParticle(ParticleSystem particleSystem, PVector source, PVector destination) {
     particleSystem.addParticle(source, destination);
   }
     
-  void render(ParticleSystem particleSystem) {
+  public void render(ParticleSystem particleSystem) {
     fill(0, 100);
     rect(0, 0, width, height);
   
-    frame_number++;
+    this.frameNumber++;
   
-    ArrayList<Keyframe> keyframeChain = keyframes.get(frame_number);
+    ArrayList<Keyframe> keyframeChain = keyframes.get(frameNumber);
   
     particleSystem.run();
   
     for (int i=0; keyframeChain != null && i < keyframeChain.size(); ++i) {
       Keyframe keyframe = keyframeChain.get(i);
   
-      PVector source_coord = geodetic_to_cartesian(keyframe.start_latitude, keyframe.start_longitude);
-      PVector dest_coord = geodetic_to_cartesian(keyframe.end_latitude, keyframe.end_longitude);
+      PVector source_coord = geodeticToCartesian(keyframe.start_latitude, keyframe.start_longitude);
+      PVector dest_coord = geodeticToCartesian(keyframe.end_latitude, keyframe.end_longitude);
   
-      float init_x = source_coord.x;
-      float init_y = source_coord.y;
-  
-      float end_x = dest_coord.x;
-      float end_y = dest_coord.y;
-  
-      drawProviderLocation(init_x, init_y);
-      drawBookingLocation(end_x, end_y);
+      //drawProviderLocation(source_coord);
+      //drawBookingLocation(dest_coord);
       
-      spawnParticle(particleSystem, new PVector(init_x % width, init_y % height), new PVector(end_x % width, end_y % height));
+      spawnParticle(particleSystem, source_coord, dest_coord);
     }
   }
 }
