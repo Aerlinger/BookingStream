@@ -1,0 +1,41 @@
+desc "Encodes timestamp of all bookings (based on start and end date) with coordinates of booking and provider into a JSON file."
+task export_booking_stream: :environment do
+  confirmed_bookings = Booking.confirmed.past.where(region_id: 5).where('date_start > ?', 1.month.ago)
+
+  stream_content = []
+
+  puts "Writing JSON stream for #{confirmed_bookings.count} bookings"
+
+  count = 0
+
+  confirmed_bookings.find_each do |booking|
+    provider = booking.provider
+    count    += 1
+
+    puts "Encoded #{count}/#{confirmed_bookings.count} bookings" if count % 100 == 0
+
+    if provider.present? && booking.present?
+
+      stream_content.push({
+                            index:              count,
+                            booking_id:         booking.id,
+                            provider_id:        booking.provider_id,
+                            date_start:         booking.date_start,
+                            date_end:           booking.date_end,
+                            date_start_unix:    booking.date_start.to_time.to_i,
+                            date_end_unix:      booking.date_end.to_time.to_i,
+                            booking_latitude:   booking.latitude,
+                            booking_longitude:  booking.longitude,
+                            provider_latitude:  provider.try(:latitude) || 0,
+                            provider_longitude: provider.try(:longitude) || 0
+                          })
+    end
+  end
+
+  puts "Writing JSON stream for #{confirmed_bookings.count} bookings"
+
+  File.open("tmp/booking_stream.json", "w") do |f|
+    f.write(stream_content.to_json)
+  end
+end
+
