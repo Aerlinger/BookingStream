@@ -10,8 +10,10 @@ class Keyframe {
 
   public float end_latitude;
   public float end_longitude;
+  
+  public boolean do_trace;
 
-  public Keyframe(long frame_start, long frame_end, PVector source, PVector destination) { //float start_latitude, float start_longitude, float end_latitude, float end_longitude) {
+  public Keyframe(long frame_start, long frame_end, PVector source, PVector destination, boolean do_trace) { //float start_latitude, float start_longitude, float end_latitude, float end_longitude) {
     this.frame_start = frame_start;
     this.frame_end = frame_end;
 
@@ -20,6 +22,18 @@ class Keyframe {
 
     this.end_latitude = destination.x;
     this.end_longitude = destination.y;
+    
+    this.do_trace = do_trace;
+  }
+  
+  public long durationInFrames() {
+    return frame_end - frame_start;
+  }
+  
+  public float durationInSeconds() {
+    float hours = durationInFrames() / SIM_FRAMES_PER_HOUR;  // frames/(frames/hour)
+   
+    return hoursToSeconds(hours);
   }
 
   String toString() {

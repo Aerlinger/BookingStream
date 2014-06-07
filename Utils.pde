@@ -9,10 +9,14 @@ long unixtime_to_frame_number(long timestamp) {
   long seconds_since_start_of_all_bookings = (timestamp - min_time);
   int hours = secondsToHours(seconds_since_start_of_all_bookings);
 
-  return hours * sim_frames_per_hour;
+  return hours * SIM_FRAMES_PER_HOUR;
 }
 
 int secondsToHours(long seconds) {
   return (int) seconds / 3600;
+}
+
+int hoursToSeconds(float hours) {
+  return (int) hours * 3600;
 }
 

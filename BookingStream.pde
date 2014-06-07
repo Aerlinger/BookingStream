@@ -1,13 +1,13 @@
 ParticleSystem particlePool;
 Renderer renderer;
 
-int fps = 30;
+int fps = 60;
 
-// 1 second in simulation == 1 hour when sim_frames_per_hour = fps.
-int sim_frames_per_hour = 1;
+// 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
+int SIM_FRAMES_PER_HOUR = 60;
 
 // Assume it takes a pro 1/2 hour to get to a job
-int provider_travel_time_in_frames = sim_frames_per_hour / 2;  
+int provider_travel_time_in_frames = SIM_FRAMES_PER_HOUR / 2;  
 
 long max_time; 
 long min_time; 
@@ -19,14 +19,14 @@ float max_latitude;
 float min_longitude;
 float max_longitude;
 
-float LAT_RANGE = 0.6;
-float LON_RANGE = 0.6;
+float LAT_RANGE = 0.3;
+float LON_RANGE = 0.3;
 
 float corrected_min_latitude = 40.7 - LAT_RANGE / 2;
 float corrected_max_latitude = 40.7 + LAT_RANGE / 2;
 
-float corrected_min_longitude = -73.97 - LON_RANGE / 2;
-float corrected_max_longitude = -73.97 + LON_RANGE / 2;
+float corrected_min_longitude = -74 - LON_RANGE / 2;
+float corrected_max_longitude = -74 + LON_RANGE / 2;
 
 void precalculateGeospatialBoundaries(JSONArray booking_events) {
   min_time = Long.MAX_VALUE;
@@ -70,12 +70,19 @@ void precalculateGeospatialBoundaries(JSONArray booking_events) {
   }
 }
 
+boolean APPLY_JITTER = true;
+
 void parseJSON(JSONArray booking_events) {
    for (int i = 0; i < booking_events.size(); i++) {    
     JSONObject booking = booking_events.getJSONObject(i); 
 
     long booking_start_time  = booking.getInt("date_start_unix");
     long booking_end_time    = booking.getInt("date_end_unix");
+    
+    if(APPLY_JITTER) {
+      booking_start_time += random(-3600, 3600);
+      booking_end_time += random(-3600, 3600);
+    }
 
     float booking_latitude   = booking.getFloat("booking_latitude");
     float booking_longitude  = booking.getFloat("booking_longitude");
@@ -86,13 +93,18 @@ void parseJSON(JSONArray booking_events) {
     PVector booking_location   = new PVector(booking_latitude, booking_longitude);
     PVector provider_location  = new PVector(provider_latitude, provider_longitude);
 
-    int provider_travel_time_in_seconds = 30 * 60;
+    int provider_travel_time_in_seconds = 300 * 60;
 
-    // Provider travels from their home to a booking.
-    renderer.addKeyframeByUnixTime(booking_start_time, booking_start_time - provider_travel_time_in_seconds, provider_location, booking_location);
+    // TODO: AvailabilityLog Dispatch
+
+    // Provider travels from their home to a booking:
+    renderer.addKeyframeByUnixTime(booking_start_time - provider_travel_time_in_seconds, booking_start_time, provider_location, booking_location, true);
     
-    // Provider travels from a booking to their home.
-    renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location);
+    // Provider stays at booking location for three hours:
+    renderer.addKeyframeByUnixTime(booking_start_time, booking_end_time, booking_location, booking_location, false);
+    
+    // Provider travels from a booking to their home:
+    renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location, true);
   }
 }
 
@@ -108,26 +120,23 @@ void printDebugInfo() {
 void setup() {
   int WIDTH = 1280;
   int HEIGHT = 1024;
+
+  frameRate(fps);  
+  size(WIDTH, HEIGHT);
+  background(255);
+  smooth();
   
   JSONArray booking_events = loadJSONArray("/Users/Aerlinger/Documents/Processing/particle_system/booking_stream.json");
 
   particlePool = new ParticleSystem(); 
-
   precalculateGeospatialBoundaries(booking_events);
-
   printDebugInfo();
   
   renderer = new Renderer();
   parseJSON(booking_events);
-
-  size(WIDTH, HEIGHT);
-  background(0);
-  noStroke();
 }
 
 void draw() {
   renderer.render(particlePool);  
 }
-
-
 

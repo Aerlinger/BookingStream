@@ -17,21 +17,21 @@ class ParticleSystem {
     particles = new ArrayList<Particle>();
   }
 
-  void addParticle() {
-    particles.add(new Particle(origin, destination));
+  void addParticle(int colr, long lifetimeInFrames, boolean do_trace) {
+    particles.add(new Particle(origin, destination, colr, lifetimeInFrames, do_trace));
   }
 
-  void addParticle(PVector source, PVector destination) {
-    particles.add(new Particle(source, destination));
+  void addParticle(PVector source, PVector destination, int colr, long lifetimeInFrames, boolean do_trace) {
+    particles.add(new Particle(source, destination, colr, lifetimeInFrames, do_trace));
   }
 
-  void run() {
+  void run(Renderer renderContext) {
     for (int i = particles.size ()-1; i >= 0; i--) {
       Particle p = particles.get(i);
-      p.step();
-      //if (p.isDead()) {
-      //  particles.remove(i);
-      //}
+      p.step(renderContext);
+      if (p.isDead()) {
+        particles.remove(i);
+      }
     }
   }
 }
