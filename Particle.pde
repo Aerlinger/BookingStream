@@ -14,6 +14,8 @@ class Particle {
   int colr;
   long lifetimeInFrames = 0;
   int nframes = 0;
+  
+  PVector[] history;
 
   public Particle(PVector source, PVector destination, int colr, long lifetimeInFrames, int do_trace) {
     this.step = 1.0/(lifetimeInFrames + 1);
@@ -29,11 +31,12 @@ class Particle {
 
     distX = endX - beginX;
     distY = endY - beginY;
+    
+    history = new PVector[(int) lifetimeInFrames + 1];
   }
 
   void step(Renderer renderer) {
     if (pct < 1.0) {
-      nframes++;
       update();
       display(renderer);
     }
@@ -41,12 +44,8 @@ class Particle {
 
   void display(Renderer renderer) {
     fill(colr);
-    x = beginX + pct * distX;
-    y = beginY + pct * distY;
     
-    pct += this.step;
-      
-    if (do_trace != 0 && pct > .01 && pct < 1) {
+    if (do_trace != 0) {
       if (do_trace == TRACE_TO) {
         stroke(0, 255, 0, 200);
         fill(0, 255, 255);
@@ -61,22 +60,40 @@ class Particle {
       float y2 = y + 10 * sin(PI * pct) * (this.step * distY);
       
       line(x, y, x2, y2);
-      noStroke();
       
+      // Draw trail
+      for (int i=history.length-2; i>0; --i) {
+        PVector p1 = history[i-1];
+        PVector p2 = history[i];
+        
+        if(p1 != null && p2 != null) {
+          stroke(10*i % 255, 30 * i % 255, 20 * i % 255, 255 - i);
+          line(p1.x, p1.y, p2.x, p2.y);
+        }
+      }
+      
+      noStroke();
     } else {
-      float complete = ((float) nframes) / lifetimeInFrames;
-
       fill(100 * pct, 255, 100 * pct, 255);
       ellipse(x, y, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2);
     }
   }
 
   void update() {
+    x = beginX + pct * distX;
+    y = beginY + pct * distY;
+    
+    history[nframes] = new PVector(x, y);
+    
+    pct += this.step;
+    
+    nframes++;
   }
 
   // Is the particle still useful?
   boolean isDead() {
-    return this.pct >= 1.0;
+    return false;
+    //return this.pct >= 1.0;
   }
 }
 

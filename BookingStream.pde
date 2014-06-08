@@ -1,7 +1,4 @@
 import processing.video.*;
-//import moviemaker.*;
-
-//MovieMaker mm;
 
 ParticleSystem particlePool;
 Renderer renderer;
@@ -174,7 +171,6 @@ void setup() {
   frameRate(fps);  
   size(WIDTH, HEIGHT);
   
-  //background(255);
   noStroke();
   textSize(18);
   

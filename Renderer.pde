@@ -117,13 +117,13 @@ class Renderer extends GenericFrameEvent {
       //drawBookingLocation(particleSystem, dest_coord, keyframe.durationInFrames());
     }
     
-    if (render = true)
+    if (false)
       saveFrame("output/frame_" + (int) frameNumber + ".png");
     //mm.addFrame();
     
-    if (this.frameNumber > 400) {
-      exit();
-    }
+//    if (this.frameNumber > 400) {
+//      exit();
+//    }
   }
 }
 
