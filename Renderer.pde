@@ -29,7 +29,7 @@ class Renderer extends GenericFrameEvent {
     }
   }
   
-  public Keyframe addKeyframe(long frame_start, long frame_end, PVector sourceLocation, PVector destinationLocation, boolean do_trace) {
+  public Keyframe addKeyframe(long frame_start, long frame_end, PVector sourceLocation, PVector destinationLocation, int do_trace) {
     Keyframe keyframe = new Keyframe( frame_start, 
                                       frame_end, 
                                       sourceLocation,
@@ -49,32 +49,51 @@ class Renderer extends GenericFrameEvent {
     return keyframe;
   }
   
-  public Keyframe addKeyframeByUnixTime(long unixEpochStartTime, long unixEpochEndTime, PVector sourceLocation, PVector destinationLocation, boolean do_trace) {
+  public Keyframe addKeyframeByUnixTime(long unixEpochStartTime, long unixEpochEndTime, PVector sourceLocation, PVector destinationLocation, int do_trace) {
     long frameStart  = unixtime_to_frame_number(unixEpochStartTime);    // Provider dot leaves booking
     long frameEnd    = unixtime_to_frame_number(unixEpochEndTime);      // Provider dot arrives back home
     
     return addKeyframe(frameStart, frameEnd, sourceLocation, destinationLocation, do_trace);
   }
   
-  void drawProviderLocation(ParticleSystem particleSystem, PVector providerLocation, long lifetimeInFrames, boolean do_trace) {
-    spawnParticle(particleSystem, providerLocation, providerLocation, color(255, 255, 0), lifetimeInFrames, false);  
+  void drawProviderLocation(ParticleSystem particleSystem, PVector providerLocation, long lifetimeInFrames) {
+    spawnParticle(particleSystem, providerLocation, providerLocation, color(255, 255, 255), lifetimeInFrames, 0); 
   }
   
-  void drawBookingLocation(ParticleSystem particleSystem, PVector bookingLocation, long lifetimeInFrames, boolean do_trace) {
-    spawnParticle(particleSystem, bookingLocation, bookingLocation, color(0, 255, 255), lifetimeInFrames, false);  
+  void drawBookingLocation(ParticleSystem particleSystem, PVector bookingLocation, long lifetimeInFrames) {
+    spawnParticle(particleSystem, bookingLocation, bookingLocation, color(0, 255, 255), lifetimeInFrames, 0);  
   }
   
-  void spawnParticle(ParticleSystem particleSystem, PVector source, PVector destination, int colr, long lifetimeInFrames, boolean do_trace) {
+  void spawnParticle(ParticleSystem particleSystem, PVector source, PVector destination, int colr, long lifetimeInFrames, int do_trace) {
     particleSystem.addParticle(source, destination, colr, lifetimeInFrames, do_trace);
+  }
+  
+  void drawBackground() {
+    //background(bg);
+  }
+  
+  void drawLogo() {
+    image(logo, 0, 0);
+  }
+  
+  void drawTime() {
+    text(this.frameNumber, 50, 50);
+  }
+  
+  void drawSidebar() {
+    fill(0, 125);
+    rect(0, 0, 200, height);
+    drawLogo();
+    drawTime();
   }
     
   public void render(ParticleSystem particleSystem) {
-    fill(255, 255);
-    rect(0, 0, width, height);
-  
     this.frameNumber++;
   
     ArrayList<Keyframe> keyframeChain = keyframes.get(frameNumber);
+    
+    drawBackground();
+    drawSidebar();
    
 //    imgProc.blur(this.prevFrame, this.tempFrame, width, height);
 //    imgProc.scaleBrightness(this.tempFrame, this.tempFrame, width, height, 100);
@@ -83,18 +102,19 @@ class Renderer extends GenericFrameEvent {
     
 //    arraycopy(this.tempFrame, this.currFrame);
     
+    
     particleSystem.run(this);
     
     for (int i=0; keyframeChain != null && i < keyframeChain.size(); ++i) {
       Keyframe keyframe = keyframeChain.get(i);
+      
+      PVector source_coord = new PVector(keyframe.start_latitude, keyframe.start_longitude);
+      PVector dest_coord   = new PVector(keyframe.end_latitude, keyframe.end_longitude);
   
-      PVector source_coord = geodeticToCartesian(keyframe.start_latitude, keyframe.start_longitude);
-      PVector dest_coord = geodeticToCartesian(keyframe.end_latitude, keyframe.end_longitude);
-  
-      spawnParticle(particleSystem, source_coord, dest_coord, color(255, 0, 0), keyframe.durationInFrames(), keyframe.do_trace);  
-  
-      //drawProviderLocation(particleSystem, source_coord);
-      //drawBookingLocation(particleSystem, dest_coord);
+      spawnParticle(particleSystem, source_coord, dest_coord, color(255, 0, 0), keyframe.durationInFrames(), keyframe.do_trace);
+      
+      //drawProviderLocation(particleSystem, source_coord, (int) 2.5 *keyframe.durationInFrames());
+      //drawBookingLocation(particleSystem, dest_coord, keyframe.durationInFrames());
     }
     
 //    imgProc.drawPixelArray(this.currFrame, 0, 0, width, height);
@@ -104,3 +124,4 @@ class Renderer extends GenericFrameEvent {
 //    rect(0, 0, width, height);
   }
 }
+

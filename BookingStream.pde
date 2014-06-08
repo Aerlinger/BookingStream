@@ -1,10 +1,10 @@
 ParticleSystem particlePool;
 Renderer renderer;
 
-int fps = 60;
+int fps = 120;
 
 // 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
-int SIM_FRAMES_PER_HOUR = 60;
+int SIM_FRAMES_PER_HOUR = 1;
 
 // Assume it takes a pro 1/2 hour to get to a job
 int provider_travel_time_in_frames = SIM_FRAMES_PER_HOUR / 2;  
@@ -22,11 +22,24 @@ float max_longitude;
 float LAT_RANGE = 0.3;
 float LON_RANGE = 0.3;
 
-float corrected_min_latitude = 40.7 - LAT_RANGE / 2;
-float corrected_max_latitude = 40.7 + LAT_RANGE / 2;
+float corrected_min_latitude = 40.79 - LAT_RANGE / 2;
+float corrected_max_latitude = 40.79 + LAT_RANGE / 2;
 
-float corrected_min_longitude = -74 - LON_RANGE / 2;
-float corrected_max_longitude = -74 + LON_RANGE / 2;
+float corrected_min_longitude = -73.97 - LON_RANGE / 2;
+float corrected_max_longitude = -73.97 + LON_RANGE / 2;
+
+float BOOKING_RADIUS = 8;
+
+// POSITIONING:
+float[] CENTER = new float[]{40.7, -74};
+float ROTATION = 0; // Degrees 
+
+PImage bg;
+PImage logo;
+
+PVector bottomRight;
+PVector topLeft;
+
 
 void precalculateGeospatialBoundaries(JSONArray booking_events) {
   min_time = Long.MAX_VALUE;
@@ -54,7 +67,7 @@ void precalculateGeospatialBoundaries(JSONArray booking_events) {
       max_time = time_end;
 
     if (time_start < min_time)
-      min_time = time_start;
+      min_time = time_start;      
 
     if (booking_latitude < min_latitude || provider_latitude < min_latitude)
       min_latitude = Math.min(booking_latitude, provider_latitude);  
@@ -68,9 +81,19 @@ void precalculateGeospatialBoundaries(JSONArray booking_events) {
     if (booking_longitude > max_longitude || provider_longitude > max_longitude)
       max_longitude = Math.max(booking_longitude, provider_longitude);
   }
+  
+  topLeft     = geodeticToCartesian(corrected_max_latitude, corrected_min_longitude);
+  bottomRight = geodeticToCartesian(corrected_min_latitude, corrected_max_longitude);
+  
+  printLocation(topLeft, "TOP LEFT:");
+  printLocation(bottomRight, "TOP RIGHT:");
 }
 
 boolean APPLY_JITTER = true;
+
+final int TRACE_TO = 1;
+final int NO_TRACE = 0;
+final int TRACE_FROM = -1;
 
 void parseJSON(JSONArray booking_events) {
    for (int i = 0; i < booking_events.size(); i++) {    
@@ -90,21 +113,28 @@ void parseJSON(JSONArray booking_events) {
     float provider_latitude  = booking.getFloat("provider_latitude");
     float provider_longitude = booking.getFloat("provider_longitude");
     
-    PVector booking_location   = new PVector(booking_latitude, booking_longitude);
-    PVector provider_location  = new PVector(provider_latitude, provider_longitude);
+    PVector booking_location   = normalizeCoordinates(geodeticToCartesian(booking_latitude, booking_longitude));
+    PVector provider_location  = normalizeCoordinates(geodeticToCartesian(provider_latitude, provider_longitude));
+    
+    printLocation(booking_location, "PROVIDER");
+    printLocation(provider_location, "BOOKING");
 
-    int provider_travel_time_in_seconds = 300 * 60;
+    int provider_travel_time_in_seconds = 60 * 60;
+    int booking_offset = 0;
 
     // TODO: AvailabilityLog Dispatch
 
+    // Provider location:
+    //renderer.addKeyframeByUnixTime(min_time+1, max_time-1, provider_location, provider_location, NO_TRACE);
+
     // Provider travels from their home to a booking:
-    renderer.addKeyframeByUnixTime(booking_start_time - provider_travel_time_in_seconds, booking_start_time, provider_location, booking_location, true);
+    renderer.addKeyframeByUnixTime(booking_start_time - provider_travel_time_in_seconds, booking_start_time, provider_location, booking_location, TRACE_TO);
     
     // Provider stays at booking location for three hours:
-    renderer.addKeyframeByUnixTime(booking_start_time, booking_end_time, booking_location, booking_location, false);
+    renderer.addKeyframeByUnixTime(booking_start_time - booking_offset, booking_end_time + booking_offset, booking_location, booking_location, NO_TRACE);
     
     // Provider travels from a booking to their home:
-    renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location, true);
+    renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location, TRACE_FROM);
   }
 }
 
@@ -115,17 +145,25 @@ void printDebugInfo() {
   println("Max Time: ", max_time);
 
   println("Range of hours: ", secondsToHours(max_time - min_time));
+  
+  println("Coordinate Range: ", topLeft.x, topLeft.y, ", ", bottomRight.x, bottomRight.y);
 }
 
 void setup() {
+  smooth();
+  
   int WIDTH = 1280;
   int HEIGHT = 1024;
 
   frameRate(fps);  
   size(WIDTH, HEIGHT);
-  background(255);
-  smooth();
   
+  //background(255);
+  noStroke();
+  textSize(18);
+  
+  bg = loadImage("assets/nybg1280.png");
+  logo = loadImage("assets/hb_logo.png");
   JSONArray booking_events = loadJSONArray("/Users/Aerlinger/Documents/Processing/particle_system/booking_stream.json");
 
   particlePool = new ParticleSystem(); 
@@ -134,6 +172,8 @@ void setup() {
   
   renderer = new Renderer();
   parseJSON(booking_events);
+  
+  background(bg); 
 }
 
 void draw() {

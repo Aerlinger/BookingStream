@@ -11,9 +11,9 @@ class Keyframe {
   public float end_latitude;
   public float end_longitude;
   
-  public boolean do_trace;
+  public int do_trace;
 
-  public Keyframe(long frame_start, long frame_end, PVector source, PVector destination, boolean do_trace) { //float start_latitude, float start_longitude, float end_latitude, float end_longitude) {
+  public Keyframe(long frame_start, long frame_end, PVector source, PVector destination, int do_trace) {
     this.frame_start = frame_start;
     this.frame_end = frame_end;
 
