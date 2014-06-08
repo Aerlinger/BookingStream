@@ -1,6 +1,10 @@
+
+
 class Renderer extends GenericFrameEvent {
   private HashMap<Long, ArrayList<Keyframe>> keyframes;
   private long frameNumber;
+  
+  
   
   PixelShader imgProc;
  
@@ -27,6 +31,8 @@ class Renderer extends GenericFrameEvent {
       this.prevFrame[i] = color(0, 0, 0);
       this.tempFrame[i] = color(0, 0, 0);
     }
+    
+    //this.mm = new MovieMaker(this, 1280, 720, "deformation.mov",25, MovieMaker.MOTION_JPEG_B, MovieMaker.BEST);
   }
   
   public Keyframe addKeyframe(long frame_start, long frame_end, PVector sourceLocation, PVector destinationLocation, int do_trace) {
@@ -69,21 +75,23 @@ class Renderer extends GenericFrameEvent {
   }
   
   void drawBackground() {
-    //background(bg);
+    background(bg);
   }
   
   void drawLogo() {
-    image(logo, 0, 0);
+    image(logo, 50, 10);
   }
   
   void drawTime() {
-    text(this.frameNumber, 50, 50);
+    text(this.frameNumber /(float) SIM_FRAMES_PER_HOUR, width - 105, 25);
   }
   
   void drawSidebar() {
     fill(0, 125);
-    rect(0, 0, 200, height);
+    rect(0, 0, width, 70);
     drawLogo();
+    fill(255, 255);
+    
     drawTime();
   }
     
@@ -94,14 +102,6 @@ class Renderer extends GenericFrameEvent {
     
     drawBackground();
     drawSidebar();
-   
-//    imgProc.blur(this.prevFrame, this.tempFrame, width, height);
-//    imgProc.scaleBrightness(this.tempFrame, this.tempFrame, width, height, 100);
-//     fill(255, 10);
-//    rect(0, 0, width, height);
-    
-//    arraycopy(this.tempFrame, this.currFrame);
-    
     
     particleSystem.run(this);
     
@@ -117,11 +117,13 @@ class Renderer extends GenericFrameEvent {
       //drawBookingLocation(particleSystem, dest_coord, keyframe.durationInFrames());
     }
     
-//    imgProc.drawPixelArray(this.currFrame, 0, 0, width, height);
-//    arraycopy(this.currFrame, this.prevFrame);
-
-//    fill(255, 25);
-//    rect(0, 0, width, height);
+    if (render = true)
+      saveFrame("output/frame_" + (int) frameNumber + ".png");
+    //mm.addFrame();
+    
+    if (this.frameNumber > 400) {
+      exit();
+    }
   }
 }
 

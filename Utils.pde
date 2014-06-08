@@ -1,10 +1,10 @@
 PVector normalizeCoordinates(PVector coordinates) {
   //PVector coords = rotate(-1, coordinates);
   
-  float xNorm = (coordinates.x - topLeft.x) / Math.abs(topLeft.x - bottomRight.x) * width;
-  float yNorm = (coordinates.y - topLeft.y) / Math.abs(topLeft.y - bottomRight.y) * height;
+  float xNorm = (coordinates.x - topLeft.x) / Math.abs(topLeft.x - bottomRight.x) * width * ZOOM;
+  float yNorm = (coordinates.y - topLeft.y) / Math.abs(topLeft.y - bottomRight.y) * height * ZOOM;
   
-  return rotate(-1, new PVector(xNorm, yNorm));
+  return rotation(ROTATION, new PVector(xNorm, yNorm));
 }
 
 float deg2rad(float degrees) {
@@ -14,19 +14,15 @@ float deg2rad(float degrees) {
 PVector geodeticToCartesian(float lat, float lon) {
   float latRads = (float) deg2rad(lat);//Math.toRadians(lat);
   
-  float x = (float) ((180.0 + lon) / 360.0) * 100;
-  float y = (float) (1 - log(tan(latRads) + 1 / cos(latRads)) / PI) / 2 * 100;
+  float x = (float) ((180.0 + lon) / 360.0);
+  float y = (float) (1 - log(tan(latRads) + 1 / cos(latRads)) / PI) / 2;
   
   return new PVector(x, y);
 }
 
-PVector rotate(float angleInRads, PVector orig) {
-  //PVector center = new PVector(width, height/2);
-  
-  PVector center = normalizeCoordinates(geodeticToCartesian((corrected_max_latitude + corrected_min_latitude)/2, (corrected_max_longitude + corrected_min_longitude)/2));
-  
-  float x = center.x + (orig.x - center.x) * cos(angleInRads) - (orig.y - center.y) * sin(angleInRads);
-  float y = center.y + (orig.x - center.x) * sin(angleInRads) - (orig.y - center.y) * cos(angleInRads);
+PVector rotation(float angleInRads, PVector orig) {
+  float x = width/2  + (orig.x - width/2) * cos(angleInRads) - (orig.y - height/2) * sin(angleInRads);
+  float y = height/2 + (orig.x - width/2) * sin(angleInRads) + (orig.y - height/2) * cos(angleInRads);
   
   return new PVector(x, y);
 }

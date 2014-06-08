@@ -24,13 +24,8 @@ class Particle {
     pct = 0.0;
     beginX = source.x;
     beginY = source.y;
-    //x = beginX;
-    //y = beginY;
     endX = destination.x;
     endY = destination.y;
-    
-    //printLocation(source, "SOURCE");
-    //printLocation(destination, "destination");
 
     distX = endX - beginX;
     distY = endY - beginY;
@@ -53,10 +48,10 @@ class Particle {
       
     if (do_trace != 0 && pct > .01 && pct < 1) {
       if (do_trace == TRACE_TO) {
-        stroke(0, 255, 0, 255);
+        stroke(0, 255, 0, 200);
         fill(0, 255, 255);
       } else {
-        stroke(255, 0, 255, 255);
+        stroke(255, 0, 255, 200);
         fill(255, 0, 255);
       }
       
@@ -65,14 +60,14 @@ class Particle {
       float x2 = x + 10 * sin(PI * pct) * (this.step * distX);
       float y2 = y + 10 * sin(PI * pct) * (this.step * distY);
       
-      //line(x, y, x2, y2);
+      line(x, y, x2, y2);
       noStroke();
       
     } else {
       float complete = ((float) nframes) / lifetimeInFrames;
 
-      fill(255 * pct, 255 - 255 * pct, 255 * pct);
-      ellipse(x, y, BOOKING_RADIUS/2 * sin(PI * pct) + BOOKING_RADIUS/ 2, BOOKING_RADIUS/2 * sin(PI * pct) + BOOKING_RADIUS/2);
+      fill(100 * pct, 255, 100 * pct, 255);
+      ellipse(x, y, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2);
     }
   }
 

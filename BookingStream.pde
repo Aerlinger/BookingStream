@@ -1,10 +1,15 @@
+import processing.video.*;
+//import moviemaker.*;
+
+//MovieMaker mm;
+
 ParticleSystem particlePool;
 Renderer renderer;
 
 int fps = 120;
 
 // 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
-int SIM_FRAMES_PER_HOUR = 1;
+int SIM_FRAMES_PER_HOUR = 90;
 
 // Assume it takes a pro 1/2 hour to get to a job
 int provider_travel_time_in_frames = SIM_FRAMES_PER_HOUR / 2;  
@@ -19,20 +24,25 @@ float max_latitude;
 float min_longitude;
 float max_longitude;
 
-float LAT_RANGE = 0.3;
-float LON_RANGE = 0.3;
+float LAT_RANGE = 0.33;
+float LON_RANGE = 0.33;
 
-float corrected_min_latitude = 40.79 - LAT_RANGE / 2;
-float corrected_max_latitude = 40.79 + LAT_RANGE / 2;
+float CENTER_LAT = 40.779;
+float CENTER_LON = -73.97;
 
-float corrected_min_longitude = -73.97 - LON_RANGE / 2;
-float corrected_max_longitude = -73.97 + LON_RANGE / 2;
+float ZOOM = 1;
 
-float BOOKING_RADIUS = 8;
+float corrected_min_latitude = CENTER_LAT - LAT_RANGE / 2;
+float corrected_max_latitude = CENTER_LAT + LAT_RANGE / 2;
+
+float corrected_min_longitude = CENTER_LON - LON_RANGE / 2;
+float corrected_max_longitude = CENTER_LON + LON_RANGE / 2;
+
+float BOOKING_RADIUS = 5;
 
 // POSITIONING:
 float[] CENTER = new float[]{40.7, -74};
-float ROTATION = 0; // Degrees 
+float ROTATION = -.21; // Degrees 
 
 PImage bg;
 PImage logo;
@@ -84,6 +94,8 @@ void precalculateGeospatialBoundaries(JSONArray booking_events) {
   
   topLeft     = geodeticToCartesian(corrected_max_latitude, corrected_min_longitude);
   bottomRight = geodeticToCartesian(corrected_min_latitude, corrected_max_longitude);
+   
+  center = normalizeCoordinates(geodeticToCartesian((corrected_max_latitude + corrected_min_latitude)/2, (corrected_max_longitude + corrected_min_longitude)/2));
   
   printLocation(topLeft, "TOP LEFT:");
   printLocation(bottomRight, "TOP RIGHT:");
@@ -96,6 +108,8 @@ final int NO_TRACE = 0;
 final int TRACE_FROM = -1;
 
 void parseJSON(JSONArray booking_events) {
+  
+  
    for (int i = 0; i < booking_events.size(); i++) {    
     JSONObject booking = booking_events.getJSONObject(i); 
 
@@ -125,7 +139,7 @@ void parseJSON(JSONArray booking_events) {
     // TODO: AvailabilityLog Dispatch
 
     // Provider location:
-    //renderer.addKeyframeByUnixTime(min_time+1, max_time-1, provider_location, provider_location, NO_TRACE);
+    renderer.addKeyframeByUnixTime(min_time+1, max_time-1, provider_location, provider_location, NO_TRACE);
 
     // Provider travels from their home to a booking:
     renderer.addKeyframeByUnixTime(booking_start_time - provider_travel_time_in_seconds, booking_start_time, provider_location, booking_location, TRACE_TO);
@@ -148,6 +162,8 @@ void printDebugInfo() {
   
   println("Coordinate Range: ", topLeft.x, topLeft.y, ", ", bottomRight.x, bottomRight.y);
 }
+
+PVector center;
 
 void setup() {
   smooth();
