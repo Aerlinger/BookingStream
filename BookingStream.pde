@@ -1,7 +1,7 @@
 import java.util.HashSet;
 Renderer renderer;
 
-int fps = 40;
+int fps = 120;
 
 // 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
 int SIM_FRAMES_PER_HOUR = 60;
@@ -19,26 +19,41 @@ float max_latitude;
 float min_longitude;
 float max_longitude;
 
-float LAT_RANGE = 0.33;
-float LON_RANGE = 0.33;
+float LON_RANGE = 0.35;
+float LAT_RANGE = 0.6 * LON_RANGE;
 
-float CENTER_LAT = 40.779;
-float CENTER_LON = -73.97;
+// BOTTOM_LEFT:
+//-73.69834899902344
+//40.64183303643054
+
+//TOP RIGHT:
+//-74.13093566894531
+//40.896905775860006
+
+float CENTER_LAT = 40.782;
+float CENTER_LON = -73.915;
 
 float ZOOM = 1;
 
-float corrected_min_latitude = CENTER_LAT - LAT_RANGE / 2;
-float corrected_max_latitude = CENTER_LAT + LAT_RANGE / 2;
+//float corrected_min_latitude = CENTER_LAT - LAT_RANGE / 2;
+//float corrected_max_latitude = CENTER_LAT + LAT_RANGE / 2;
 
-float corrected_min_longitude = CENTER_LON - LON_RANGE / 2;
-float corrected_max_longitude = CENTER_LON + LON_RANGE / 2;
+//float corrected_min_longitude = CENTER_LON - LON_RANGE / 2;
+//float corrected_max_longitude = CENTER_LON + LON_RANGE / 2;
 
-float BOOKING_RADIUS = 5;
+// New York:
+float corrected_min_latitude = 40.64183303643054; 
+float corrected_max_latitude = 40.896905775860006;
+
+float corrected_min_longitude = -74.13093566894531;
+float corrected_max_longitude = -73.69834899902344;
+
+float BOOKING_RADIUS = 3;
 float BOOKING_JITTER = 1200;
 
 // POSITIONING:
 float[] CENTER = new float[]{40.7, -74};
-float ROTATION = -.21; // Degrees 
+float ROTATION = 0;//-.22; // Degrees 
 
 PImage bg;
 PImage logo;
@@ -104,8 +119,8 @@ final int NO_TRACE = 0;
 final int TRACE_FROM = -1;
 
 void processBookingEvent(JSONObject jsonObj) {
-  long bookingStartTime = jsonObj.getInt("date_start_unix");
-  long bookingEndTime = jsonObj.getInt("date_end_unix");
+  long startTime = jsonObj.getInt("date_start_unix");
+  long endTime = jsonObj.getInt("date_end_unix");
   
   float bookingLatitude   = jsonObj.getFloat("booking_latitude");
   float bookingLongitude  = jsonObj.getFloat("booking_longitude");
@@ -123,11 +138,10 @@ void processBookingEvent(JSONObject jsonObj) {
   
   renderer.addProvider(new PVector(providerPos.x, providerPos.y));
   
-  if(type.equals("availability_log")) {
-    //println("AVAILABILITY LOG: [", booking_latitude, ", ", booking_longitude, "] [", provider_latitude, ", ", provider_longitude, "]");
-  } else {
-    renderer.addBooking(bookingStartTime, bookingEndTime, bookingPos, providerPos);
-  }
+  if(type.equals("availability_log"))
+    renderer.addAvailabilityLog(startTime, bookingPos, providerPos);
+  else
+    renderer.addBooking(startTime, endTime, bookingPos, providerPos);
 }
 
 void parseJSON(JSONArray booking_events) {

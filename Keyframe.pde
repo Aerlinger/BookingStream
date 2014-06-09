@@ -12,8 +12,9 @@ class Keyframe {
   public float end_longitude;
   
   public int do_trace;
+  public String type;
 
-  public Keyframe(long frame_start, long frame_end, PVector source, PVector destination, int do_trace) {
+  public Keyframe(String type, long frame_start, long frame_end, PVector source, PVector destination, int do_trace) {
     this.frame_start = frame_start;
     this.frame_end = frame_end;
 
@@ -24,6 +25,7 @@ class Keyframe {
     this.end_longitude = destination.y;
     
     this.do_trace = do_trace;
+    this.type = type;
   }
   
   public long durationInFrames() {

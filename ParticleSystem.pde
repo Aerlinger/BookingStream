@@ -9,13 +9,6 @@ class ParticleSystem {
   int particleColor;
   boolean doTrace = false;
   int traceColor;
-
-  ParticleSystem(PVector source, PVector sink) {
-    origin = source.get();
-    destination = sink.get();
-
-    particles = new ArrayList<Particle>();
-  }
   
   ParticleSystem(int particleColor, boolean doTrace) {
     origin       = new PVector(0, 0);
@@ -27,12 +20,12 @@ class ParticleSystem {
     particles = new ArrayList<Particle>();
   }
 
-  void addParticle(int colr, long lifetimeInFrames, int do_trace) {
-    particles.add(new Particle(origin, destination, colr, lifetimeInFrames, do_trace));
+  void addParticle(long lifetimeInFrames, int do_trace) {
+    particles.add(new Particle(origin, destination, this.particleColor, lifetimeInFrames, do_trace));
   }
 
-  void addParticle(PVector source, PVector destination, int colr, long lifetimeInFrames, int do_trace) {
-    particles.add(new Particle(source, destination, colr, lifetimeInFrames, do_trace));
+  void addParticle(PVector source, PVector destination, long lifetimeInFrames, int do_trace) {
+    particles.add(new Particle(source, destination, this.particleColor, lifetimeInFrames, do_trace));
   }
   
   void updateHistory(PVector newPosition) {
