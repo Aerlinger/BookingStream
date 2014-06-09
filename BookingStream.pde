@@ -1,6 +1,4 @@
 import java.util.HashSet;
-
-ParticleSystem particlePool;
 Renderer renderer;
 
 int fps = 40;
@@ -167,8 +165,7 @@ void setup() {
   bg = loadImage("assets/ny_bg_dark.png");
   logo = loadImage("assets/hb_logo.png");
   JSONArray booking_events = loadJSONArray("json/booking_logs_stream.json");
-
-  particlePool = new ParticleSystem(); 
+  
   precalculateGeospatialBoundaries(booking_events);
   printDebugInfo();
   
@@ -179,6 +176,6 @@ void setup() {
 }
 
 void draw() {
-  renderer.render(particlePool);  
+  renderer.render();  
 }
 

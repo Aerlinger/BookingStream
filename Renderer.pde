@@ -33,6 +33,8 @@ class Renderer extends GenericFrameEvent {
     this.prevFrame = new int[width*height];
     this.tempFrame = new int[width*height];
     
+    this.Bookings = new ParticleSystem(color(255, 255, 0), true);
+    
     for(int i=0; i<width*height; i++) {
       this.currFrame[i] = color(0, 0, 0);
       this.prevFrame[i] = color(0, 0, 0);
@@ -135,7 +137,7 @@ class Renderer extends GenericFrameEvent {
     drawTime();
   }
   
-  public void render(ParticleSystem particleSystem) {
+  public void render() {
     this.frameNumber++;
   
     ArrayList<Keyframe> keyframeChain = keyframes.get(frameNumber);
@@ -144,20 +146,15 @@ class Renderer extends GenericFrameEvent {
     drawSidebar();
     
     drawProviderLocations();
-    particleSystem.run(this);
-    
-    //println("FN: ", this.frameNumber);
-    //if(keyframeChain != null)
-     // println(keyframeChain.size());
+    this.Bookings.run(this);
     
     for (int i=0; keyframeChain != null && i < keyframeChain.size(); ++i) {
       Keyframe keyframe = keyframeChain.get(i);
-      //println("KF: ", keyframeChain.size());
       
       PVector source_coord = new PVector(keyframe.start_latitude, keyframe.start_longitude);
       PVector dest_coord   = new PVector(keyframe.end_latitude, keyframe.end_longitude);
   
-      spawnParticle(particleSystem, source_coord, dest_coord, color(255, 0, 0), keyframe.durationInFrames(), keyframe.do_trace);
+      spawnParticle(this.Bookings, source_coord, dest_coord, color(255, 0, 0), keyframe.durationInFrames(), keyframe.do_trace);
     }
     
     if (false)

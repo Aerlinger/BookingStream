@@ -5,6 +5,10 @@ class ParticleSystem {
   
   ArrayList history = new ArrayList();
   float distthresh = 60;
+  
+  int particleColor;
+  boolean doTrace = false;
+  int traceColor;
 
   ParticleSystem(PVector source, PVector sink) {
     origin = source.get();
@@ -13,9 +17,12 @@ class ParticleSystem {
     particles = new ArrayList<Particle>();
   }
   
-  ParticleSystem() {
+  ParticleSystem(int particleColor, boolean doTrace) {
     origin       = new PVector(0, 0);
     destination  = new PVector(0, 0);
+    
+    this.particleColor = particleColor;
+    this.doTrace       = doTrace;
 
     particles = new ArrayList<Particle>();
   }
