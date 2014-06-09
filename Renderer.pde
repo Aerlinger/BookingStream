@@ -18,8 +18,8 @@ class Renderer {
   int[] prevFrame;
   int[] tempFrame;
   
-  final int BOOKING_COLOR = color(255, 0, 0);
-  final int PROVIDER_COLOR = color(0, 255, 0);
+  final int BOOKING_COLOR = color(0, 255, 0);
+  final int PROVIDER_COLOR = color(255, 0, 0);
   final int LOG_COLOR = color(255, 125, 0);
   
   int provider_travel_time_in_seconds = 30 * 60;
@@ -168,7 +168,7 @@ class Renderer {
     
     String am_pm = (hour_of_day > 12) ? "PM" : "AM";
     
-    text(month_start + "/" + (int) (day_start + days_elapsed) + "/2014  " + hour_of_day % 12 + ":" + minutes + " " + am_pm, width - 235, 25);
+    text(month_start + "/" + (int) (day_start + days_elapsed) + "/2014  " + hour_of_day % 12 + ":" + minutes + " " + am_pm, width - 255, 45);
   }
   
   void drawSidebar() {
@@ -203,6 +203,13 @@ class Renderer {
     fill(PROVIDER_COLOR, 255);
     ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 5, 5);
     text("Provider location", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 95);
+    
+    stroke(LOG_COLOR, 255);
+    fill(LOG_COLOR, 255);
+    line(legendLeft + margin, height - legendBottom - legendHeight + 120, legendLeft + margin + 10, height - legendBottom - legendHeight + 120);
+    text("Job Notification", legendLeft + 1.5 * margin + 10, height - legendBottom - legendHeight + 125);
+    
+    noStroke();
   }
   
   boolean hasProviderAtLocation(PVector providerLocation) {
@@ -218,9 +225,8 @@ class Renderer {
     drawSidebar();
     
     drawProviderLocations();
-    
-    this.BookingParticles.run(this);
     this.AvailabilityLogParticles.run(this);
+    this.BookingParticles.run(this);
     
     for (int i=0; keyframeChain != null && i < keyframeChain.size(); ++i) {
       Keyframe keyframe = keyframeChain.get(i);

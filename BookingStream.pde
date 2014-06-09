@@ -135,7 +135,7 @@ void processBookingEvent(JSONObject jsonObj) {
 
   float providerLatitude  = jsonObj.getFloat("provider_latitude");
   float providerLongitude = jsonObj.getFloat("provider_longitude");
-  int providerID          = jsonObj.getInt("provider_id");
+  //int providerID          = jsonObj.getInt("provider_id");
   
   PVector bookingLocation = new PVector(bookingLatitude, bookingLongitude);
   PVector providerLocation = new PVector(providerLatitude, providerLongitude);
