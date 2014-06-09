@@ -5,6 +5,7 @@ class Particle {
   float endY = 320.0;   // Final y-coordinate
   float distX;          // X-axis distance to move
   float distY;          // Y-axis distance to move
+  float distance;
 
   float x = 0.0;        // Current x-coordinate
   float y = 0.0;        // Current y-coordinate
@@ -28,9 +29,11 @@ class Particle {
     beginY = source.y;
     endX = destination.x;
     endY = destination.y;
-
+    
     distX = endX - beginX;
     distY = endY - beginY;
+    
+    distance = sqrt(distX * distX + distY * distY);
     
     history = new PVector[(int) lifetimeInFrames + 1];
   }
@@ -51,8 +54,8 @@ class Particle {
       else 
         stroke(this.colr, 100);
       
-      float x2 = x + 30 * (this.step * distX) / lifetimeInFrames;
-      float y2 = y + 30 * (this.step * distY) / lifetimeInFrames;
+      float x2 = x + 10 * distX / distance;
+      float y2 = y + 10 * distY / distance;
       
       if (x < 5000 && x2 < 5000 && x > 0 && y > 0) {
         strokeWeight(2);
@@ -67,7 +70,6 @@ class Particle {
       } else {
         ellipse(x, y, BOOKING_RADIUS * sin(PI * pct) + 1, BOOKING_RADIUS * sin(PI * pct) + 1);
       }
-        
     }
   }
 
@@ -82,8 +84,7 @@ class Particle {
 
   // Is the particle still useful?
   boolean isDead() {
-    return false;
-    //return this.pct >= 1.0;
+    return this.pct >= 2.0;
   }
 }
 

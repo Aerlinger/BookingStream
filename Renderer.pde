@@ -18,7 +18,10 @@ class Renderer {
   int[] prevFrame;
   int[] tempFrame;
   
+  final int BOOKING_COLOR = color(255, 0, 0);
   final int PROVIDER_COLOR = color(0, 255, 0);
+  final int LOG_COLOR = color(255, 125, 0);
+  
   int provider_travel_time_in_seconds = 30 * 60;
   int booking_offset = 0;
   
@@ -33,8 +36,8 @@ class Renderer {
     this.prevFrame = new int[width*height];
     this.tempFrame = new int[width*height];
     
-    this.BookingParticles = new ParticleSystem(color(255, 0, 0), true);
-    this.AvailabilityLogParticles = new ParticleSystem(color(255, 126, 0), true);
+    this.BookingParticles = new ParticleSystem(BOOKING_COLOR, true);
+    this.AvailabilityLogParticles = new ParticleSystem(LOG_COLOR, true);
     
     for(int i=0; i<width*height; i++) {
       this.currFrame[i] = color(0, 0, 0);
@@ -87,7 +90,20 @@ class Renderer {
 //  }
   
   void addProvider(PVector ProviderLocation) {
-    this.providerLocations.add(ProviderLocation);
+    if (!this.providerLocations.add(ProviderLocation)) {
+      //if (ProviderLocation.x > -501 && ProviderLocation.x < -499 && ProviderLocation.y < 1992 && ProviderLocation.y > 1991) {
+        //float providerLatitude = random(corrected_min_latitude, corrected_max_latitude);
+         //float providerLongitude = random(corrected_min_longitude, corrected_max_longitude);
+      
+        //addProvider(normalizeCoordinates(geodeticToCartesian(providerLatitude, providerLongitude)));
+        //println("COLLISION", ProviderLocation.x, ProviderLocation.y);
+        
+        //float providerX = random(0, 1280);
+        //float providerY = random(0, 1024);
+        
+        //addProvider(new PVector(providerX, providerY));
+      //}
+    }
   }
     
   void addBooking(long bookingStartTime, long bookingEndTime, PVector BookingLocation, PVector ProviderLocation) {
@@ -132,16 +148,27 @@ class Renderer {
   }
   
   void drawBackground() {
-    tint(255, 50);
+    tint(255, 5);
     background(bg);
   }
   
   void drawLogo() {
-    image(logo, 50, 10);
+    tint(255, 255);
+    image(logo, 0, 5);
   }
   
   void drawTime() {
-    text(this.frameNumber /(float) SIM_FRAMES_PER_HOUR, width - 105, 25);
+    textSize(22);
+    
+    float hours_elapsed = this.frameNumber /(float) SIM_FRAMES_PER_HOUR;
+    
+    int hour_of_day = (int) Math.floor(hours_elapsed);
+    int minutes = (int) ((hours_elapsed - hour_of_day) * 60.0);
+    int days_elapsed = (int) hours_elapsed / 24;
+    
+    String am_pm = (hour_of_day > 12) ? "PM" : "AM";
+    
+    text(month_start + "/" + (int) (day_start + days_elapsed) + "/2014  " + hour_of_day % 12 + ":" + minutes + " " + am_pm, width - 235, 25);
   }
   
   void drawSidebar() {
@@ -151,6 +178,31 @@ class Renderer {
     fill(255, 255);
     
     drawTime();
+  }
+  
+  void drawLegend() {
+    float legendLeft = 20;
+    float legendBottom = 20;
+    float legendHeight = 150;
+    float legendWidth = 200;
+    float margin = 15; 
+    textSize(16);
+    
+    // Background
+    fill(0, 200);
+    rect(legendLeft, height - legendBottom - legendHeight, legendWidth, legendHeight);
+    
+    fill(BOOKING_COLOR, 255);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 30, 5, 5);
+    text("Booking in progress", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 35);
+    
+    fill(LOG_COLOR, 255);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 60, 5, 5);
+    text("Booking made", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 65);
+    
+    fill(PROVIDER_COLOR, 255);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 5, 5);
+    text("Provider location", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 95);
   }
   
   boolean hasProviderAtLocation(PVector providerLocation) {
@@ -185,6 +237,8 @@ class Renderer {
     
     if (false)
       saveFrame("output/frame_" + (int) frameNumber + ".png");
+      
+    drawLegend();
   }
 }
 

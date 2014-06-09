@@ -19,8 +19,12 @@ float max_latitude;
 float min_longitude;
 float max_longitude;
 
-float LON_RANGE = 0.35;
-float LAT_RANGE = 0.6 * LON_RANGE;
+
+
+int days_elapsed = 0;
+int month_start = 6;
+int day_start = 8;
+int hours_elapsed = 0;
 
 // BOTTOM_LEFT:
 //-73.69834899902344
@@ -33,11 +37,14 @@ float LAT_RANGE = 0.6 * LON_RANGE;
 float CENTER_LAT = 40.782;
 float CENTER_LON = -73.915;
 
+float LON_RANGE = 1.5;
+float LAT_RANGE = 0.6 * LON_RANGE;
+
 float ZOOM = 1;
 
 //float corrected_min_latitude = CENTER_LAT - LAT_RANGE / 2;
 //float corrected_max_latitude = CENTER_LAT + LAT_RANGE / 2;
-
+//
 //float corrected_min_longitude = CENTER_LON - LON_RANGE / 2;
 //float corrected_max_longitude = CENTER_LON + LON_RANGE / 2;
 
@@ -117,6 +124,7 @@ boolean APPLY_JITTER = true;
 final int TRACE_TO = 1;
 final int NO_TRACE = 0;
 final int TRACE_FROM = -1;
+int n_nodes;
 
 void processBookingEvent(JSONObject jsonObj) {
   long startTime = jsonObj.getInt("date_start_unix");
@@ -127,6 +135,7 @@ void processBookingEvent(JSONObject jsonObj) {
 
   float providerLatitude  = jsonObj.getFloat("provider_latitude");
   float providerLongitude = jsonObj.getFloat("provider_longitude");
+  int providerID          = jsonObj.getInt("provider_id");
   
   PVector bookingLocation = new PVector(bookingLatitude, bookingLongitude);
   PVector providerLocation = new PVector(providerLatitude, providerLongitude);
@@ -135,6 +144,15 @@ void processBookingEvent(JSONObject jsonObj) {
   
   PVector providerPos = normalizeCoordinates(geodeticToCartesian(providerLatitude, providerLongitude));
   PVector bookingPos = normalizeCoordinates(geodeticToCartesian(bookingLatitude, bookingLongitude));
+
+  if (providerLatitude > 39.3999 && providerLatitude < 40.401) {
+    //printLocation(providerPos, "POS_");
+//    providerLatitude = random(corrected_min_latitude, corrected_max_latitude);
+//    providerLongitude = random(corrected_min_longitude, corrected_max_longitude); 
+  } 
+  //else if(providerLongitude < -74.299 && providerLongitude > -74.301) {
+//    providerLongitude = random(corrected_min_longitude, corrected_max_longitude);
+//  }
   
   renderer.addProvider(new PVector(providerPos.x, providerPos.y));
   
@@ -174,7 +192,7 @@ void setup() {
   size(WIDTH, HEIGHT);
   
   noStroke();
-  textSize(18);
+  textSize(22);
   
   bg = loadImage("assets/ny_bg_dark.png");
   logo = loadImage("assets/hb_logo.png");

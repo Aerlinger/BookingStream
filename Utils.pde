@@ -1,6 +1,4 @@
-PVector normalizeCoordinates(PVector coordinates) {
-  //PVector coords = rotate(-1, coordinates);
-  
+PVector normalizeCoordinates(PVector coordinates) {  
   float xNorm = (coordinates.x - topLeft.x) / Math.abs(topLeft.x - bottomRight.x) * width * ZOOM;
   float yNorm = (coordinates.y - topLeft.y) / Math.abs(topLeft.y - bottomRight.y) * height * ZOOM;
   
