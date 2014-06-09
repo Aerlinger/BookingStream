@@ -1,12 +1,12 @@
-import processing.video.*;
+import java.util.HashSet;
 
 ParticleSystem particlePool;
 Renderer renderer;
 
-int fps = 120;
+int fps = 40;
 
 // 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
-int SIM_FRAMES_PER_HOUR = 90;
+int SIM_FRAMES_PER_HOUR = 60;
 
 // Assume it takes a pro 1/2 hour to get to a job
 int provider_travel_time_in_frames = SIM_FRAMES_PER_HOUR / 2;  
@@ -36,6 +36,7 @@ float corrected_min_longitude = CENTER_LON - LON_RANGE / 2;
 float corrected_max_longitude = CENTER_LON + LON_RANGE / 2;
 
 float BOOKING_RADIUS = 5;
+float BOOKING_JITTER = 1200;
 
 // POSITIONING:
 float[] CENTER = new float[]{40.7, -74};
@@ -104,48 +105,37 @@ final int TRACE_TO = 1;
 final int NO_TRACE = 0;
 final int TRACE_FROM = -1;
 
+void processBookingEvent(JSONObject jsonObj) {
+  long bookingStartTime = jsonObj.getInt("date_start_unix");
+  long bookingEndTime = jsonObj.getInt("date_end_unix");
+  
+  float bookingLatitude   = jsonObj.getFloat("booking_latitude");
+  float bookingLongitude  = jsonObj.getFloat("booking_longitude");
+
+  float providerLatitude  = jsonObj.getFloat("provider_latitude");
+  float providerLongitude = jsonObj.getFloat("provider_longitude");
+  
+  PVector bookingLocation = new PVector(bookingLatitude, bookingLongitude);
+  PVector providerLocation = new PVector(providerLatitude, providerLongitude);
+  
+  String type = jsonObj.getString("type");
+  
+  PVector providerPos = normalizeCoordinates(geodeticToCartesian(providerLatitude, providerLongitude));
+  PVector bookingPos = normalizeCoordinates(geodeticToCartesian(bookingLatitude, bookingLongitude));
+  
+  renderer.addProvider(new PVector(providerPos.x, providerPos.y));
+  
+  if(type.equals("availability_log")) {
+    //println("AVAILABILITY LOG: [", booking_latitude, ", ", booking_longitude, "] [", provider_latitude, ", ", provider_longitude, "]");
+  } else {
+    renderer.addBooking(bookingStartTime, bookingEndTime, bookingPos, providerPos);
+  }
+}
+
 void parseJSON(JSONArray booking_events) {
-  
-  
    for (int i = 0; i < booking_events.size(); i++) {    
-    JSONObject booking = booking_events.getJSONObject(i); 
-
-    long booking_start_time  = booking.getInt("date_start_unix");
-    long booking_end_time    = booking.getInt("date_end_unix");
-    
-    if(APPLY_JITTER) {
-      booking_start_time += random(-3600, 3600);
-      booking_end_time += random(-3600, 3600);
-    }
-
-    float booking_latitude   = booking.getFloat("booking_latitude");
-    float booking_longitude  = booking.getFloat("booking_longitude");
-
-    float provider_latitude  = booking.getFloat("provider_latitude");
-    float provider_longitude = booking.getFloat("provider_longitude");
-    
-    PVector booking_location   = normalizeCoordinates(geodeticToCartesian(booking_latitude, booking_longitude));
-    PVector provider_location  = normalizeCoordinates(geodeticToCartesian(provider_latitude, provider_longitude));
-    
-    printLocation(booking_location, "PROVIDER");
-    printLocation(provider_location, "BOOKING");
-
-    int provider_travel_time_in_seconds = 60 * 60;
-    int booking_offset = 0;
-
-    // TODO: AvailabilityLog Dispatch
-
-    // Provider location:
-    renderer.addKeyframeByUnixTime(min_time+1, max_time-1, provider_location, provider_location, NO_TRACE);
-
-    // Provider travels from their home to a booking:
-    renderer.addKeyframeByUnixTime(booking_start_time - provider_travel_time_in_seconds, booking_start_time, provider_location, booking_location, TRACE_TO);
-    
-    // Provider stays at booking location for three hours:
-    renderer.addKeyframeByUnixTime(booking_start_time - booking_offset, booking_end_time + booking_offset, booking_location, booking_location, NO_TRACE);
-    
-    // Provider travels from a booking to their home:
-    renderer.addKeyframeByUnixTime(booking_end_time, booking_end_time + provider_travel_time_in_seconds, booking_location, provider_location, TRACE_FROM);
+    JSONObject bookingEvent = booking_events.getJSONObject(i); 
+    processBookingEvent(bookingEvent);
   }
 }
 
@@ -174,9 +164,9 @@ void setup() {
   noStroke();
   textSize(18);
   
-  bg = loadImage("assets/nybg1280.png");
+  bg = loadImage("assets/ny_bg_dark.png");
   logo = loadImage("assets/hb_logo.png");
-  JSONArray booking_events = loadJSONArray("/Users/Aerlinger/Documents/Processing/particle_system/booking_stream.json");
+  JSONArray booking_events = loadJSONArray("json/booking_logs_stream.json");
 
   particlePool = new ParticleSystem(); 
   precalculateGeospatialBoundaries(booking_events);

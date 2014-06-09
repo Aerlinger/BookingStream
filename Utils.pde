@@ -31,15 +31,15 @@ void printLocation(PVector vector2, String tag) {
   println(tag, ": [", vector2.x, ", ", vector2.y, "]"); 
 }
 
-long unixtime_to_frame_number(long timestamp) {
+long unixtimeToFrameNumber(long timestamp) {
   long seconds_since_start_of_all_bookings = (timestamp - min_time);
-  int hours = secondsToHours(seconds_since_start_of_all_bookings);
+  float hours = secondsToHours(seconds_since_start_of_all_bookings);
 
-  return hours * SIM_FRAMES_PER_HOUR;
+  return (long) (hours * SIM_FRAMES_PER_HOUR);
 }
 
-int secondsToHours(long seconds) {
-  return (int) seconds / 3600;
+float secondsToHours(long seconds) {
+  return (float) seconds / 3600.0;
 }
 
 int hoursToSeconds(float hours) {

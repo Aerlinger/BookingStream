@@ -43,23 +43,26 @@ class Particle {
   }
 
   void display(Renderer renderer) {
+    println("disp particle", x, y);
     fill(colr);
     
-    if (do_trace != 0) {
+    if (do_trace != 0 && pct < 1) {
       if (do_trace == TRACE_TO) {
         stroke(0, 255, 0, 200);
         fill(0, 255, 255);
       } else {
-        stroke(255, 0, 255, 200);
+        stroke(0, 255, 255, 200);
         fill(255, 0, 255);
       }
       
       strokeWeight(1);
       
-      float x2 = x + 10 * sin(PI * pct) * (this.step * distX);
-      float y2 = y + 10 * sin(PI * pct) * (this.step * distY);
+      float x2 = x + 50 * (this.step * distX) / lifetimeInFrames;
+      float y2 = y + 50 * (this.step * distY) / lifetimeInFrames;
       
-      line(x, y, x2, y2);
+      if (x < 5000 && x2 < 5000 && x > 0 && y > 0) {
+        line(x, y, x2, y2);
+      }
       
       // Draw trail
       for (int i=history.length-2; i>0; --i) {
@@ -67,7 +70,7 @@ class Particle {
         PVector p2 = history[i];
         
         if(p1 != null && p2 != null) {
-          stroke(10*i % 255, 30 * i % 255, 20 * i % 255, 255 - i);
+          //stroke(10*i % 255, 30 * i % 255, 20 * i % 255, 255 - i);
           line(p1.x, p1.y, p2.x, p2.y);
         }
       }
@@ -75,7 +78,7 @@ class Particle {
       noStroke();
     } else {
       fill(100 * pct, 255, 100 * pct, 255);
-      ellipse(x, y, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2, BOOKING_RADIUS * sin(PI/2 * pct) + BOOKING_RADIUS/2);
+      ellipse(x, y, BOOKING_RADIUS * sin(PI/2 * pct) + 2, BOOKING_RADIUS * sin(PI/2 * pct) + 2);
     }
   }
 
@@ -83,7 +86,7 @@ class Particle {
     x = beginX + pct * distX;
     y = beginY + pct * distY;
     
-    history[nframes] = new PVector(x, y);
+    //history[nframes] = new PVector(x, y);
     
     pct += this.step;
     

@@ -33,25 +33,13 @@ class ParticleSystem {
   }
 
   void run(Renderer renderContext) {
-    //PVector newPos;
     for (int i = particles.size ()-1; i >= 0; i--) {
       Particle p = particles.get(i);
       p.step(renderContext);
-      //PVector newPos = new PVector(p.x, p.y);
-      //updateHistory(newPos);
       if (p.isDead()) {
         particles.remove(i);
       }
-//      for (int j=0; j<history.size(); j++){
-//        PVector v = (PVector) history.get(j);
-//        float joinchance = j/history.size() + newPos.dist(v)/distthresh;
-//        stroke(255, 10);
-//        if (joinchance < random(0.4))  line(newPos.x,newPos.y,v.x,v.y);
-//        noStroke();
-//      }
     }
-    
-    
   }
 }
 
