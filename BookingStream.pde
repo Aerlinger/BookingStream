@@ -19,11 +19,9 @@ float max_latitude;
 float min_longitude;
 float max_longitude;
 
-
-
 int days_elapsed = 0;
 int month_start = 6;
-int day_start = 3;
+int day_start = 6;
 int hours_elapsed = 0;
 
 // BOTTOM_LEFT:
@@ -90,24 +88,28 @@ void precalculateGeospatialBoundaries(JSONArray booking_events) {
 
     float provider_latitude  = booking.getFloat("provider_latitude");
     float provider_longitude = booking.getFloat("provider_longitude");
+    
+    String type = booking.getString("type");
+
+    //if(type.equals("booking")) {
+      if (time_end > max_time)
+        max_time = time_end;
   
-    if (time_end > max_time)
-      max_time = time_end;
-
-    if (time_start < min_time)
-      min_time = time_start;      
-
-    if (booking_latitude < min_latitude || provider_latitude < min_latitude)
-      min_latitude = Math.min(booking_latitude, provider_latitude);  
-
-    if (booking_latitude > max_latitude || provider_latitude > max_latitude)
-      max_latitude = Math.max(booking_latitude, provider_latitude);
-
-    if (booking_longitude < min_longitude || provider_longitude < min_longitude)
-      min_longitude = Math.min(booking_longitude, provider_longitude);  
-
-    if (booking_longitude > max_longitude || provider_longitude > max_longitude)
-      max_longitude = Math.max(booking_longitude, provider_longitude);
+      if (time_start < min_time)
+        min_time = time_start;      
+  
+      if (booking_latitude < min_latitude || provider_latitude < min_latitude)
+        min_latitude = Math.min(booking_latitude, provider_latitude);  
+  
+      if (booking_latitude > max_latitude || provider_latitude > max_latitude)
+        max_latitude = Math.max(booking_latitude, provider_latitude);
+  
+      if (booking_longitude < min_longitude || provider_longitude < min_longitude)
+        min_longitude = Math.min(booking_longitude, provider_longitude);  
+  
+      if (booking_longitude > max_longitude || provider_longitude > max_longitude)
+        max_longitude = Math.max(booking_longitude, provider_longitude);
+    //}
   }
   
   topLeft     = geodeticToCartesian(corrected_max_latitude, corrected_min_longitude);
@@ -144,15 +146,6 @@ void processBookingEvent(JSONObject jsonObj) {
   
   PVector providerPos = normalizeCoordinates(geodeticToCartesian(providerLatitude, providerLongitude));
   PVector bookingPos = normalizeCoordinates(geodeticToCartesian(bookingLatitude, bookingLongitude));
-
-  if (providerLatitude > 39.3999 && providerLatitude < 40.401) {
-    //printLocation(providerPos, "POS_");
-//    providerLatitude = random(corrected_min_latitude, corrected_max_latitude);
-//    providerLongitude = random(corrected_min_longitude, corrected_max_longitude); 
-  } 
-  //else if(providerLongitude < -74.299 && providerLongitude > -74.301) {
-//    providerLongitude = random(corrected_min_longitude, corrected_max_longitude);
-//  }
   
   renderer.addProvider(new PVector(providerPos.x, providerPos.y));
   

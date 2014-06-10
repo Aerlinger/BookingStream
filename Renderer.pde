@@ -75,12 +75,16 @@ class Renderer {
     long frameStart  = unixtimeToFrameNumber(unixEpochStartTime);    // Provider dot leaves booking
     long frameEnd    = unixtimeToFrameNumber(unixEpochEndTime);      // Provider dot arrives back home
     
+    println("Adding keyframe: ", frameStart, frameEnd, sourceLocation.x, sourceLocation.y);
+    
     return addKeyframe("booking", frameStart, frameEnd, sourceLocation, destinationLocation, doTrace);
   }
   
   public Keyframe addLogKeyframeByUnixTime(long unixEpochStartTime, long unixEpochEndTime, PVector sourceLocation, PVector destinationLocation, int doTrace) {
     long frameStart  = unixtimeToFrameNumber(unixEpochStartTime);    // Provider dot leaves booking
     long frameEnd    = unixtimeToFrameNumber(unixEpochEndTime);      // Provider dot arrives back home
+    
+    //println("Adding log: ", frameStart, frameEnd, sourceLocation.x, sourceLocation.y);
     
     return addKeyframe("availability_log", frameStart, frameEnd, sourceLocation, destinationLocation, doTrace);
   }
@@ -123,7 +127,7 @@ class Renderer {
     long arrival_time = LogStartTime + provider_travel_time_in_seconds;
     
     renderer.addLogKeyframeByUnixTime(LogStartTime, LogStartTime + provider_travel_time_in_seconds/2, BookingLocation, ProviderLocation, TRACE_TO);
-    renderer.addLogKeyframeByUnixTime(LogStartTime, LogStartTime + provider_travel_time_in_seconds*3, BookingLocation, BookingLocation, NO_TRACE);
+    renderer.addLogKeyframeByUnixTime(LogStartTime, LogStartTime + provider_travel_time_in_seconds/3, BookingLocation, BookingLocation, NO_TRACE);
     renderer.addLogKeyframeByUnixTime(arrival_time, arrival_time + provider_travel_time_in_seconds, ProviderLocation, ProviderLocation, NO_TRACE);
   }
   
@@ -207,7 +211,7 @@ class Renderer {
     text("Booking made", legendLeft + 1.6 * margin, height - legendBottom - legendHeight + 65);
     
     fill(PROVIDER_COLOR, 255);
-    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 10, 10);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 5, 5);
     text("Provider location", legendLeft + 1.6 * margin, height - legendBottom - legendHeight + 95);
     
     stroke(LOG_COLOR, 255);
@@ -254,13 +258,13 @@ class Renderer {
     
     drawLegend();
     
-    if (frameNumber > 630 && frameNumber < 2250) {
-      String filename = "output/frame_" + String.format("%04d", (int) frameNumber) + ".png";
+    //if (frameNumber > 540) {
+      String filename = "output/booking_stream_" + String.format("%04d", (int) frameNumber) + ".png";
       println("Saving: ", filename);
       saveFrame(filename);
-    }
+    //}
     
-    if(frameNumber > 1800)
+    if(frameNumber > 4000)
       exit();
   }
 }
