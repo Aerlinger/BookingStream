@@ -65,10 +65,10 @@ class Particle {
       noStroke();
     } else {
       if(renderer.hasProviderAtLocation(new PVector(x, y))) {
-        fill(2555, 125, 125, 255 * sin(PI * pct));
-        ellipse(x, y, BOOKING_RADIUS * sin(PI * pct) + 2, BOOKING_RADIUS * sin(PI * pct) + 2);
+        fill(255, 125, 125, 125 + 125 * sin(PI * pct));
+        ellipse(x, y, BOOKING_RADIUS * sin(PI * pct) + 1, BOOKING_RADIUS * sin(PI * pct) + 1);
       } else {
-        ellipse(x, y, 3*BOOKING_RADIUS * sin(PI * pct) + 1, 3*BOOKING_RADIUS * sin(PI * pct) + 1);
+        ellipse(x, y, 2.5*BOOKING_RADIUS * sin(PI * pct) + 1, 2.5*BOOKING_RADIUS * sin(PI * pct) + 1);
       }
     }
   }

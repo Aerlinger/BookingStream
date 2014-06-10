@@ -1,10 +1,10 @@
 import java.util.HashSet;
 Renderer renderer;
 
-int fps = 120;
+int fps = 30;
 
 // 1 second in simulation == 1 hour when SIM_FRAMES_PER_HOUR = fps. A higher value here makes the simulation seem slower
-int SIM_FRAMES_PER_HOUR = 60;
+int SIM_FRAMES_PER_HOUR = 90;
 
 // Assume it takes a pro 1/2 hour to get to a job
 int provider_travel_time_in_frames = SIM_FRAMES_PER_HOUR / 2;  
@@ -23,7 +23,7 @@ float max_longitude;
 
 int days_elapsed = 0;
 int month_start = 6;
-int day_start = 8;
+int day_start = 3;
 int hours_elapsed = 0;
 
 // BOTTOM_LEFT:
@@ -196,7 +196,7 @@ void setup() {
   
   bg = loadImage("assets/ny_bg_dark.png");
   logo = loadImage("assets/hb_logo.png");
-  JSONArray booking_events = loadJSONArray("json/booking_logs_stream.json");
+  JSONArray booking_events = loadJSONArray("json/booking_stream.json");
   
   precalculateGeospatialBoundaries(booking_events);
   printDebugInfo();

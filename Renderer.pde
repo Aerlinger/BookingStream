@@ -120,7 +120,7 @@ class Renderer {
   }
   
   void addAvailabilityLog(long LogStartTime, PVector BookingLocation, PVector ProviderLocation) {
-    long arrival_time = LogStartTime + provider_travel_time_in_seconds/2;
+    long arrival_time = LogStartTime + provider_travel_time_in_seconds;
     
     renderer.addLogKeyframeByUnixTime(LogStartTime, LogStartTime + provider_travel_time_in_seconds/2, BookingLocation, ProviderLocation, TRACE_TO);
     renderer.addLogKeyframeByUnixTime(LogStartTime, LogStartTime + provider_travel_time_in_seconds*3, BookingLocation, BookingLocation, NO_TRACE);
@@ -164,11 +164,17 @@ class Renderer {
     
     int hour_of_day = (int) Math.floor(hours_elapsed);
     int minutes = (int) ((hours_elapsed - hour_of_day) * 60.0);
+    String minutes_str = String.format("%02d", minutes);
     int days_elapsed = (int) hours_elapsed / 24;
     
-    String am_pm = (hour_of_day > 12) ? "PM" : "AM";
+    String am_pm = (hour_of_day >= 12) ? "PM" : "AM";
     
-    text(month_start + "/" + (int) (day_start + days_elapsed) + "/2014  " + hour_of_day % 12 + ":" + minutes + " " + am_pm, width - 255, 45);
+    hour_of_day = hour_of_day % 12;
+    
+    if(hour_of_day == 0)
+      hour_of_day = 12;
+    
+    text(month_start + "/" + (int) (day_start + days_elapsed) + "/2014  " + hour_of_day + ":" + minutes_str + " " + am_pm, width - 255, 45);
   }
   
   void drawSidebar() {
@@ -193,21 +199,26 @@ class Renderer {
     rect(legendLeft, height - legendBottom - legendHeight, legendWidth, legendHeight);
     
     fill(BOOKING_COLOR, 255);
-    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 30, 5, 5);
-    text("Booking in progress", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 35);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 30, 10, 10);
+    text("Booking in progress", legendLeft + 1.6 * margin, height - legendBottom - legendHeight + 35);
     
     fill(LOG_COLOR, 255);
-    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 60, 5, 5);
-    text("Booking made", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 65);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 60, 10, 10);
+    text("Booking made", legendLeft + 1.6 * margin, height - legendBottom - legendHeight + 65);
     
     fill(PROVIDER_COLOR, 255);
-    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 5, 5);
-    text("Provider location", legendLeft + 1.5 * margin, height - legendBottom - legendHeight + 95);
+    ellipse(legendLeft + margin, height - legendBottom - legendHeight + 90, 10, 10);
+    text("Provider location", legendLeft + 1.6 * margin, height - legendBottom - legendHeight + 95);
     
     stroke(LOG_COLOR, 255);
     fill(LOG_COLOR, 255);
     line(legendLeft + margin, height - legendBottom - legendHeight + 120, legendLeft + margin + 10, height - legendBottom - legendHeight + 120);
     text("Job Notification", legendLeft + 1.5 * margin + 10, height - legendBottom - legendHeight + 125);
+    
+    stroke(LOG_COLOR, 255);
+    fill(LOG_COLOR, 255);
+    
+    //text(frameNumber, legendLeft + 1.5 * margin + 10, height - legendBottom - legendHeight + 155);
     
     noStroke();
   }
@@ -241,10 +252,16 @@ class Renderer {
         spawnAvailabilityLog(source_coord, dest_coord, color(255, 0, 0), keyframe.durationInFrames(), keyframe.do_trace);
     }
     
-    if (false)
-      saveFrame("output/frame_" + (int) frameNumber + ".png");
-      
     drawLegend();
+    
+    if (frameNumber > 630 && frameNumber < 2250) {
+      String filename = "output/frame_" + String.format("%04d", (int) frameNumber) + ".png";
+      println("Saving: ", filename);
+      saveFrame(filename);
+    }
+    
+    if(frameNumber > 1800)
+      exit();
   }
 }
 
